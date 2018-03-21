@@ -1,0 +1,152 @@
+ <!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>ITEC230 Project</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="animate.css">
+		<link rel="stylesheet" type="text/css" href="Hover/css/hover.css">
+
+		<link href="https://fonts.googleapis.com/css?family=Raleway:300,400" rel="stylesheet">
+		<script type="text/javascript">
+          // function to insert a string inside another string
+         String.prototype.insert = function (index, string) {
+            if (index > 0) return this.substring(0, index) + string + this.substring(index, this.length);
+            else return string + this;
+         };
+         function Encrypt() {
+            
+            // A = 65 , Z = 90
+            var Fcode = 65;
+            var Lcode = 90;
+            var origStr = document.getElementById("text").value;
+            var encrStr = '';
+            var shift = Number(document.getElementById("shift").value);
+            var roundedShift;
+            origStr = origStr.toUpperCase();
+            var currentCode = Number(0);
+                
+            
+            // validating that shift is a positive number
+            if (isNaN(shift) || shift != Math.abs(shift)) {
+            	document.getElementById("shift").style.borderBottomColor='#FF0000'
+                document.getElementById("res").innerHTML = "Shift Must be a positive number.";
+                return;
+            }
+            else {
+            	document.getElementById("shift").style.borderBottomColor="#34495e";
+
+            }
+
+            // Encryption using ascii codes
+            for (var i = 0; i < origStr.length; i++) {
+                currentCode = origStr.charCodeAt(i);
+                if (currentCode >= Fcode && currentCode <= Lcode) {
+                    if ((currentCode + shift) > Lcode) {
+                        roundedShift = shift - (Lcode - currentCode)
+                        currentCode = Fcode - 1;
+                        newCode = currentCode + roundedShift;
+                        encrStr += String.fromCharCode(newCode);
+                    }
+                    else {
+                        newCode = currentCode + shift;
+                        encrStr += String.fromCharCode(newCode);
+                    }
+                }
+                else encrStr += String.fromCharCode(currentCode);
+            }
+            
+             // Inserting Random spaces in the cipher text to make the it harder to break
+            var randomCheck;
+            encrStr = encrStr.replace(/\s+/g, '');
+            for (var i = 0; i < encrStr.length; i++) {
+                randomCheck = Math.floor(Math.random() * 4);
+                if (encrStr[i - 1] == " ") continue;
+                if (!randomCheck) encrStr = encrStr.insert(i, " ");
+            }
+            
+            // showing the result
+            document.getElementById("res").innerHTML = encrStr.trim();
+            $("#res").shuffleLetters();
+            return;
+
+         }
+         function Decrypt() {
+            var Fcode = 65; // first code : A
+            var Lcode = 90; // Last code : Z
+            var origStr = document.getElementById("text").value;
+            var decrStr = '';
+            var shift = Number(document.getElementById("shift").value);
+            var roundedShift;
+            origStr = origStr.toUpperCase();
+            var currentCode = Number(0);
+            
+            // validating that shift is a positive number
+            if (isNaN(shift) || shift != Math.abs(shift)) {
+            	document.getElementById("shift").style.borderBottomColor='#FF0000'
+                document.getElementById("res").innerHTML = "Shift Must be a positive number.";
+                return;
+            }
+            else {
+            	document.getElementById("shift").style.borderBottomColor="#34495e"
+            }
+        
+            
+            // Decryption using ascii codes
+            for (i = 0; i < origStr.length; i++) {
+                currentCode = origStr.charCodeAt(i);
+                if (currentCode >= Fcode && currentCode <= Lcode) {
+                    if ((currentCode - shift) < Fcode) {
+                        roundedShift = shift - (currentCode - Fcode)
+                        currentCode = Lcode + 1;
+                        newCode = currentCode - roundedShift;
+                        decrStr += String.fromCharCode(newCode);
+                    }
+                    else {
+                        newCode = currentCode - shift;
+                        decrStr += String.fromCharCode(newCode);
+                    }
+                }
+                else decrStr += String.fromCharCode(currentCode);
+            }
+            document.getElementById("res").innerHTML = decrStr;
+            $("#res").shuffleLetters();
+            }
+        </script>
+	</head>
+	<body>
+        <div id="pos">
+            <UL class="nav">
+                <li><a href="Caesar.html" id="active">Caesar</a></li>
+                <li><a href="Vigenere.html">Vignere</a></li>
+                <li><a href="Chinese.html">Chinese</a></li>
+            </UL> 
+        </div>
+		<div  id="form_container">
+			<form  id="form" method="get" action="">
+				<ul>
+					<li>
+						<input id="text" class="animated fadeInLeft" name="text" type="text" maxlength="255" placeholder="Text"/> 
+					</li>
+					<li>
+						<input id="shift" class="animated fadeInLeft" name="shift" type="text" maxlength="255" placeholder="Shift"/> 
+					</li>
+					<li>
+						<textarea class="animated fadeInLeft" id="res"  style="text-align: center;"  rows="3"placeholder="Result" readonly>Result</textarea>	
+					</li>
+				</ul>
+			</form>	
+			<li id="btn">
+	           <button class="sbtn" name="crybtn" onclick="Encrypt()">Encrypt</button>
+	           <button class="rbtn" onclick="Decrypt()">Decrypt</button>
+            </li>
+            <BR>
+		</div>
+		<div id="footer">
+			<center><h5> 2017 &copy  Created by Abdurahman Fayad &amp; Fahmi Elfituri .</h5></center>
+		</div>
+        <!-- JavaScript includes -->
+        <script src="http://code.jquery.com/jquery-1.6.3.min.js"></script>
+        <script src="js/jquery.shuffleLetters.js"></script>
+	</body>
+</html>

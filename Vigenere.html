@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>ITEC230 Project</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="animate.css">
+		<link rel="stylesheet" type="text/css" href="Hover/css/hover.css">
+
+		<link href="https://fonts.googleapis.com/css?family=Raleway:300,400" rel="stylesheet">
+		<script type="text/javascript">
+        
+        // function to insert a string inside another string
+        String.prototype.insert = function (index, string) {
+            if (index > 0) return this.substring(0, index) + string + this.substring(index, this.length);
+            else return string + this;
+        };
+
+        function Encrypt() {
+            // A = 65 , Z = 90
+            var maxLet = 90;
+            var minLet = 65;
+            var rowCode;
+            var colCode;
+            var shift = Number(0);
+            var origStr = document.getElementById("text").value;
+            var encrStr = '';
+            var key = document.getElementById("key").value;
+            
+            // validating the key
+            if (!(/^[a-zA-Z]+$/.test(key))) {
+                document.getElementById("key").style.borderBottomColor='#FF0000'
+                document.getElementById("res").innerHTML = "Key can not contain numbers, symbols or spaces.";
+                return;
+            }
+            else {
+                document.getElementById("key").style.borderBottomColor="#34495e";
+
+            }
+            
+            origStr = origStr.toUpperCase();
+            
+            var currentCode = Number(0);
+            
+            // aligning the key with the text
+            var keyStr = key.repeat(parseInt(origStr.replace(/ +/g, "").length / key.length) + 1).toUpperCase();
+            for (var i = 0; i < origStr.length; i++)
+                if (origStr[i] == ' ') keyStr = keyStr.insert(i, " ");
+            keyStr = keyStr.slice(0, origStr.length);
+           
+            
+            //encryption using ascii codes
+            for (var i = 0; i < origStr.length; i++) {
+                rowCode = origStr.charCodeAt(i);
+                colCode = keyStr.charCodeAt(i);
+                if (rowCode >= minLet && rowCode <= maxLet) {
+                    shift = rowCode - minLet;
+                    if (colCode + shift > maxLet) {
+                        currentCode = (((colCode + shift) - maxLet) + minLet) - 1;
+                        encrStr += String.fromCharCode(currentCode);
+                    }
+                    else {
+                        currentCode = colCode + shift;
+                        encrStr += String.fromCharCode(currentCode);
+                    }
+                }
+                else encrStr += origStr[i];
+            }
+            
+            
+            // Inserting Random spaces in the cipher text to make it harder to break
+            var randomCheck;
+            encrStr = encrStr.replace(/\s+/g, '');
+            for (var i = 0; i < encrStr.length; i++) {
+                randomCheck = Math.floor(Math.random() * 4);
+                if (encrStr[i - 1] == " ") continue;
+                if (!randomCheck) encrStr = encrStr.insert(i, " ");
+            }
+            
+            
+            //showing the result 
+            document.getElementById("res").innerHTML = encrStr.trim();
+            $("#res").shuffleLetters();
+            return;
+        }
+
+        function Decrypt(origStr) {
+            var maxLet = 90;
+            var minLet = 65;
+            var textCode = Number(0);
+            var keyCode = Number(0);
+            var origStr = document.getElementById("text").value;
+            var decrStr = '';
+            var key = document.getElementById("key").value;
+            
+            
+            // validating the key
+            if (!(/^[a-zA-Z]+$/.test(key))) {
+                document.getElementById("key").style.borderBottomColor='#FF0000'
+                document.getElementById("res").innerHTML = "Key can not contain numbers, symbols or spaces.";
+                return;
+            }
+            else {
+                document.getElementById("key").style.borderBottomColor="#34495e";
+
+            }
+            origStr = origStr.toUpperCase();
+            
+            var currentCode = Number(0);
+            
+            
+            // aligning the key with the text
+            var keyStr = key.repeat(parseInt(origStr.replace(/ +/g, "").length / key.length) + 1).toUpperCase();
+            
+            for (var i = 0; i < origStr.length; i++)
+                if (origStr[i] == ' ') keyStr = keyStr.insert(i, " ");
+                    keyStr = keyStr.slice(0, origStr.length);
+            
+            
+            // decryption using ascii code
+            for (var i = 0; i < origStr.length; i++) {
+                textCode = origStr.charCodeAt(i);
+                keyCode = keyStr.charCodeAt(i);
+                if (textCode >= minLet && textCode <= maxLet) {
+                    if (textCode >= keyCode) {
+                        currentCode = (textCode - keyCode) + minLet;
+                        decrStr += String.fromCharCode(currentCode);
+                    }
+                    else {
+                        currentCode = (maxLet - (keyCode - textCode)) + 1;
+                        decrStr += String.fromCharCode(currentCode);
+                    }
+                }
+                else decrStr += String.fromCharCode(origStr[i]);
+            }
+            document.getElementById("res").innerHTML = decrStr;
+            $("#res").shuffleLetters();
+            return;
+        }
+    </script>
+	</head>
+	<body>
+        <div id="pos">
+            <UL class="nav">
+                <li><a href="Caesar.html">Caesar</a></li>
+                <li><a href="Vigenere.html" id="active">Vignere</a></li>
+                <li><a href="Chinese.html">Chinese</a></li>
+            </UL> 
+        </div>
+		<div  id="form_container">
+			<form  id="form" method="get" action="">
+				<ul>
+					<li>
+						<input id="text" class="animated fadeInLeft" name="text" type="text" maxlength="255" placeholder="Text"/> 
+					</li>
+					<li>
+						<input id="key" class="animated fadeInLeft" name="shift" type="text" maxlength="255" placeholder="Key"/> 
+					</li>
+					<li>
+						<textarea class="animated fadeInLeft" id="res"  style="text-align: center;"  rows="3"placeholder="Result" readonly>Result</textarea>	
+					</li>
+				</ul>
+			</form>	
+			<li id="btn">
+	           <button class="sbtn" onclick="Encrypt()">Encrypt</button>
+	           <button class="rbtn" onclick="Decrypt()">Decrypt</button>
+            </li>
+            <BR>
+		</div>
+		<div id="footer">
+			<center><h5> 2017 &copy  Created by Abdurahman Fayad &amp; Fahmi Elfituri .</h5></center>
+		</div>
+        <!-- JavaScript includes -->
+        <script src="http://code.jquery.com/jquery-1.6.3.min.js"></script>
+        <script src="js/jquery.shuffleLetters.js"></script>
+	</body>
+</html>

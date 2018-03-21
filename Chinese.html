@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>ITEC230 Project</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="animate.css">
+		<link rel="stylesheet" type="text/css" href="Hover/css/hover.css">
+
+		<link href="https://fonts.googleapis.com/css?family=Raleway:300,400" rel="stylesheet">
+    <script type="text/javascript">
+        // function to insert a string inside another string
+        String.prototype.insert = function (index, string) {
+            if (index > 0) return this.substring(0, index) + string + this.substring(index, this.length);
+            else return string + this;
+            };
+    
+    
+function Encrypt()
+        {
+            var origStr = document.getElementById("text").value;
+            var key = Number(document.getElementById("key").value);
+            
+            // validating that key is a positive number
+            if (isNaN(key) || key != Math.abs(key)) {
+            	document.getElementById("key").style.borderBottomColor='#FF0000'
+                document.getElementById("res").innerHTML = "Shift Must be a positive number.";
+                return;
+            }
+            else {
+            	document.getElementById("key").style.borderBottomColor="#34495e";
+
+            }
+            
+            // Creating an array of empty strings depending on the key
+            var stringsArray = new Array(key);
+            stringsArray = stringsArray.join(".").split(".");
+            
+            origStr = origStr.toUpperCase().replace(/\s+/g, '');
+            
+            // Crypting
+            for (var i=0; i<origStr.length ; i++)
+                {
+                    for (var j=0; j<stringsArray.length ; j++ )
+                    {
+                        // adding 'X' instead of spaces
+                      if (origStr[i] == undefined)
+                            {
+                                stringsArray[j] = 'X' + stringsArray[j];
+                                i++;
+                                continue;
+                            }   
+                        stringsArray[j] = origStr[i] + stringsArray[j];
+                              i++;
+                    }
+                    
+                  
+                    
+                    for (var j=stringsArray.length-1; j>=0 ; j-- )
+                    {
+                        if (origStr[i] == undefined )
+                            {
+                                stringsArray[j] = 'X' + stringsArray[j];
+                                i++;
+                                continue;
+                            }
+                        stringsArray[j] = origStr[i] + stringsArray[j];
+                              i++;
+                    }
+                     i--;  
+                }
+       
+            
+            // Removing the first column if every first letter is 'X'
+            var Xcheck = true;
+            for (var i=0 ; i<stringsArray.length; i++)
+                if (stringsArray[i][0] != 'X')
+                    {
+                        Xcheck = false;
+                    }
+           
+            if (Xcheck)
+                {
+                for (var i=0 ; i<stringsArray.length; i++)
+                    {
+                        stringsArray[i]= stringsArray[i].replace('X','') ;
+                    }
+                }
+
+                // Making the array one string
+                stringsArray= stringsArray.join('');
+            
+                 // Inserting Random spaces in the cipher text to make the it harder to break
+                var randomCheck;
+                for (var i = 0; i < stringsArray.length; i++) {
+                        randomCheck = Math.floor(Math.random() * 4);
+                        if (stringsArray[i - 1] == " ") continue;
+                        if (!randomCheck) stringsArray = stringsArray.insert(i, " ");
+            }
+                document.getElementById("res").innerHTML = stringsArray.trim();
+                $("#res").shuffleLetters();
+
+        }
+    
+function Decrypt()
+        {
+            // variables needed
+            // key is number of rows
+            var origStr = document.getElementById("text").value;
+            var key = Number(document.getElementById("key").value);
+            var lastIndex = Number(0);
+            var decrstr = '';
+            
+            // validating that key is a positive number
+            if (isNaN(key) || key != Math.abs(key)) {
+            	document.getElementById("key").style.borderBottomColor='#FF0000'
+                document.getElementById("res").innerHTML = "Shift Must be a positive number.";
+                return;
+            }
+            else {
+            	document.getElementById("key").style.borderBottomColor="#34495e";
+
+            }
+            
+            // Creating an array of empty strings depending on the key
+            var stringsArray = new Array(key);
+            stringsArray = stringsArray.join(".").split(".");
+          
+            origStr = origStr.toUpperCase().replace(/\s+/g, '');
+            
+            // calculating the size of each string of the array of strings
+            var stringSize = Math.ceil(origStr.length / key);
+            
+            // writing the ciphertext in the array of strings
+            for (var i=0 ; i<stringsArray.length ; i++)
+                {
+                    
+                    stringsArray[i]= origStr.substr(lastIndex , stringSize);
+                    while (stringsArray[i].length < stringSize)
+                        stringsArray[i]+= 'X';
+                    lastIndex += stringSize;
+                }
+          
+            // decrypting
+            for (var i=stringSize-1; i>=0; i--)
+                {
+                    
+                    for (var j=0 ; j < stringsArray.length ; j++)
+                        {
+                            if(stringsArray[j][i] == undefined)
+                                break;
+                            decrstr += stringsArray[j][i];
+                        }
+                    
+                    i--;
+                    
+                    
+                    for (var j=stringsArray.length-1 ; j>=0 ; j--)
+                        {
+                            if(stringsArray[j][i] == undefined)
+                                break;
+                            decrstr += stringsArray[j][i];                           
+                        }      
+                    
+                }
+            
+
+            // keeping only one 'X' at the end in case of 'X' being part of the plaintext
+            // if the 'X' is not part of the text , it will be obvious that it is an extra character.
+            while (decrstr.substr(-1 , 1) == 'X' && decrstr.substr(-2 , 1) == 'X')
+                decrstr = decrstr.substr(0,decrstr.length-1) 
+            
+
+            document.getElementById("res").innerHTML = decrstr;
+            $("#res").shuffleLetters();
+
+        }
+        
+    
+    </script>
+    
+    
+    
+	</head>
+	<body>
+        <div id="pos">
+            <UL class="nav">
+                <li><a href="Caesar.html">Caesar</a></li>
+                <li><a href="Vigenere.html">Vignere</a></li>
+                <li><a href="Chinese.html" id="active">Chinese</a></li>
+            </UL> 
+        </div>
+		<div  id="form_container">
+			<form  id="form" method="get" action="">
+				<ul>
+					<li>
+						<input id="text" class="animated fadeInLeft" name="text" type="text" maxlength="255" placeholder="Text"/> 
+					</li>
+					<li>
+						<input id="key" class="animated fadeInLeft" name="shift" type="text" maxlength="255" placeholder="Key"/> 
+					</li>
+					<li>
+						<textarea class="animated fadeInLeft" id="res"  style="text-align: center;"  rows="3"placeholder="Result" readonly>Result</textarea>	
+					</li>
+				</ul>
+			</form>	
+			<li id="btn">
+	           <button class="sbtn" onclick="Encrypt()">Encrypt</button>
+	           <button class="rbtn" onclick="Decrypt()">Decrypt</button>
+            </li>
+            <BR>
+		</div>
+		<div id="footer">
+			<center><h5> 2017 &copy  Created by Abdurahman Fayad &amp; Fahmi Elfituri . </h5></center>
+		</div>
+        <!-- JavaScript includes -->
+        <script src="http://code.jquery.com/jquery-1.6.3.min.js"></script>
+        <script src="js/jquery.shuffleLetters.js"></script>
+	</body>
+</html>
